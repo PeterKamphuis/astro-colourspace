@@ -8,3 +8,4 @@ from . import gamut
 from . import limits
 from . import slices
 from . import maps
+from . import colourspace
