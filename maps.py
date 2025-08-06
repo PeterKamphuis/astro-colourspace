@@ -28,8 +28,14 @@ try:
     import pyx
 except:
     pass
-import convert
-import gamut
+# Handle both direct execution and package import
+try:
+    from . import convert
+    from . import gamut
+except ImportError:
+    # Fallback for direct execution
+    import convert
+    import gamut
 
 CMAP = {}     # cache for Matplotlib cmaps
 CMAP_PyX = {} # cache for PyX cmaps
