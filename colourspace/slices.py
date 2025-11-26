@@ -18,14 +18,8 @@ import sys
 import os
 import numpy as np
 import pylab as plt
-# Handle both direct execution and package import
-try:
-    from . import convert
-    from . import gamut
-except ImportError:
-    # Fallback for direct execution
-    import convert
-    import gamut
+from . import convert
+from . import gamut
 res_gamut = 1
 
 #-------

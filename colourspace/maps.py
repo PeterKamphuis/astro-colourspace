@@ -28,14 +28,8 @@ try:
     import pyx
 except:
     pass
-# Handle both direct execution and package import
-try:
-    from . import convert
-    from . import gamut
-except ImportError:
-    # Fallback for direct execution
-    import convert
-    import gamut
+from . import convert
+from . import gamut
 
 CMAP = {}     # cache for Matplotlib cmaps
 CMAP_PyX = {} # cache for PyX cmaps
@@ -222,7 +216,6 @@ def make_cmap_segmented(LCH_x, LCH_y, name="segmented", modes=['clip','crop'], t
         if len(LCH_x[coord])<2 \
         or LCH_x[coord][0] != 0 or LCH_x[coord][-1] != 1 \
         or (len(LCH_x[coord])>2 and (np.array(LCH_x[coord][1:-1])-np.array(LCH_x[coord][0:-2])).min() < 0):
-            
             print("Invalid range for %s: must be monotonous from 0 to 1"%coord)
             return None
         if len(LCH_x[coord]) != len(LCH_y[coord]):
@@ -303,12 +296,11 @@ def register_to_mpl(names, reversed=True):
         print("registering cmap '%s' to Matplotlib"%(name))
         if Version(matplotlib.__version__) < Version('3.8'):
             matplotlib.cm.register_cmap(cmap=CMAP[name], name=name)
-            if reversed:
-                matplotlib.cm.register_cmap(cmap=CMAP[f'{name}_r'], name=f'{name}_r')
+            if reversed: matplotlib.cm.register_cmap(cmap=CMAP[name+'_r'], name=name+'_r')
         else:
             matplotlib.colormaps.register(cmap=CMAP[name], name=name)
-            if reversed:
-                matplotlib.colormaps.register(cmap=CMAP[f'{name}_r'], name=f'{name}_r')
+            if reversed: matplotlib.colormaps.register(cmap=CMAP[name+'_r'], name=name+'_r')
+
 #---------------
 # cmap plotting
 #---------------
