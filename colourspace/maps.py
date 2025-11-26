@@ -28,8 +28,8 @@ try:
     import pyx
 except:
     pass
-from . import convert
-from . import gamut
+from colourspace import convert
+from colourspace import gamut
 
 CMAP = {}     # cache for Matplotlib cmaps
 CMAP_PyX = {} # cache for PyX cmaps
@@ -296,10 +296,12 @@ def register_to_mpl(names, reversed=True):
         print("registering cmap '%s' to Matplotlib"%(name))
         if Version(matplotlib.__version__) < Version('3.8'):
             matplotlib.cm.register_cmap(cmap=CMAP[name], name=name)
-            if reversed: matplotlib.cm.register_cmap(cmap=CMAP[name+'_r'], name=name+'_r')
+            if reversed: 
+                matplotlib.cm.register_cmap(cmap=CMAP[name+'_r'], name=name+'_r')
         else:
             matplotlib.colormaps.register(cmap=CMAP[name], name=name)
-            if reversed: matplotlib.colormaps.register(cmap=CMAP[name+'_r'], name=name+'_r')
+            if reversed: 
+                matplotlib.colormaps.register(cmap=CMAP[name+'_r'], name=name+'_r')
 
 #---------------
 # cmap plotting

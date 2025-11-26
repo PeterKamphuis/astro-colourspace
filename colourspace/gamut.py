@@ -11,8 +11,8 @@ import matplotlib.ticker as ticker
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import interpolate
-from . import convert
-from . import limits
+from colourspace import convert
+from colourspace import limits
 
 import os
 this_dir, this_filename = os.path.split(__file__)

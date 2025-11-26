@@ -18,8 +18,8 @@ import sys
 import os
 import numpy as np
 import pylab as plt
-from . import convert
-from . import gamut
+from colourspace import convert
+from colourspace import gamut
 res_gamut = 1
 
 #-------
