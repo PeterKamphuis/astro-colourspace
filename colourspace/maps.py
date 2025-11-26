@@ -216,6 +216,7 @@ def make_cmap_segmented(LCH_x, LCH_y, name="segmented", modes=['clip','crop'], t
         if len(LCH_x[coord])<2 \
         or LCH_x[coord][0] != 0 or LCH_x[coord][-1] != 1 \
         or (len(LCH_x[coord])>2 and (np.array(LCH_x[coord][1:-1])-np.array(LCH_x[coord][0:-2])).min() < 0):
+            
             print("Invalid range for %s: must be monotonous from 0 to 1"%coord)
             return None
         if len(LCH_x[coord]) != len(LCH_y[coord]):
