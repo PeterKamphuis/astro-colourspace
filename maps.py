@@ -23,6 +23,7 @@ import os
 import numpy as np
 import pylab as plt
 import matplotlib
+from packaging.version import Version
 try:
     import pyx
 except:
@@ -293,8 +294,12 @@ def register_to_mpl(names, reversed=True):
     """ Adds a cmap to Matplotlib's internal list """
     for name in names:
         print("registering cmap '%s' to Matplotlib"%(name))
-        matplotlib.cm.register_cmap(cmap=CMAP[name], name=name)
-        if reversed: matplotlib.cm.register_cmap(cmap=CMAP[name+'_r'], name=name+'_r')
+        if Version(matplotlib.__version__) < Version('3.8'):
+            matplotlib.cm.register_cmap(cmap=CMAP[name], name=name)
+            if reversed: matplotlib.cm.register_cmap(cmap=CMAP[name+'_r'], name=name+'_r')
+        else:
+            matplotlib.colormaps.register(cmap=CMAP[name], name=name)
+            if reversed: matplotlib.colormaps.register(cmap=CMAP[name+'_r'], name=name+'_r')
 
 #---------------
 # cmap plotting
@@ -436,7 +441,7 @@ def rank_cmap(name):
 # cmap curves
 #-------------
 
-def plot_path(cmap, nsteps=None, dir=".", fname="", colours=[], widths=[], styles=[], markers=[], Cmax_ls=':', H_patch='cut', C_tol=0.01, axes=[], figsize=(4,), dpi=None, stack='Z', Z_axes='left', Z_margin=0, space='LCH', xlim=[0,1], ylim=None, xticks=0.25, yticks=None, title="", legend_label="", legend_axis=0, legend_loc=None, cmap_size="0%", cmap_pad=0.3):
+def plot_path(cmap, nsteps=None, dir=".", fname="", colours=[], widths=[], styles=[], markers=[], Cmax_ls=':', H_patch='cut', C_tol=0.01, axes=[], figsize=(4,), dpi=None, stack='Z', Z_axes='left', Z_pad=0, Z_margin=0, space='LCH', xlim=[0,1], ylim=None, xticks=0.25, yticks=None, title="", legend_label="", legend_axis=0, legend_loc=None, cmap_size="0%", cmap_pad=0.3):
         """ Plots the path of a Matplotlib `cmap` in the three dimensions of the colour space
             Extracts the curves R,G,B or L,C,H according to `space', then calls plot_3curves(curves,`space`,`stack`)
             Optionally adds an image of the cmap itself as the abscissa
@@ -483,7 +488,7 @@ def plot_path(cmap, nsteps=None, dir=".", fname="", colours=[], widths=[], style
                             curves[2][i] = curves[2][iL] + frac * (curves[2][iR]-curves[2][iL])
                         #print(iR,"C = ",curves[2][iR])
         # plot the curves
-        axes = plot_3curves(curves, colours=colours, widths=widths, styles=styles, markers=markers, Cmax_ls=Cmax_ls, axes=axes, figsize=figsize, stack=stack, Z_axes=Z_axes, Z_margin=Z_margin, space=space, xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, title=title, legend_label=legend_label, legend_axis=legend_axis, legend_loc=legend_loc)
+        axes = plot_3curves(curves, colours=colours, widths=widths, styles=styles, markers=markers, Cmax_ls=Cmax_ls, axes=axes, figsize=figsize, stack=stack, Z_axes=Z_axes, Z_pad=Z_pad, Z_margin=Z_margin, space=space, xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, title=title, legend_label=legend_label, legend_axis=legend_axis, legend_loc=legend_loc)
         # add the cmap itself
         if cmap_size != "0%":
             for i in range(3):
@@ -502,7 +507,7 @@ def plot_path(cmap, nsteps=None, dir=".", fname="", colours=[], widths=[], style
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-def plot_3curves(curves, colours=[], widths=[], styles=[], markers=[], Cmax_ls=':', axes=[], figsize=(4,), stack='Z', Z_axes='left', Z_margin=0, space='LCH', xlim=[0,1], ylim=None, xticks=0.25, yticks=None, title="", legend_label="", legend_axis=0, legend_loc=None):
+def plot_3curves(curves, colours=[], widths=[], styles=[], markers=[], Cmax_ls=':', axes=[], figsize=(4,), stack='Z', Z_axes='left', Z_pad=0, Z_margin=0, space='LCH', xlim=[0,1], ylim=None, xticks=0.25, yticks=None, title="", legend_label="", legend_axis=0, legend_loc=None):
     """ Plots the three given 1D arrays `curves`
         The figure is prepared by calling setfig_3curves(`space`,`stack`)
         If `Cmax_ls` is set, the sRGB gamut is overplotted on the C plot with this linestyle
@@ -529,7 +534,7 @@ def plot_3curves(curves, colours=[], widths=[], styles=[], markers=[], Cmax_ls='
     if len(markers)==1: markers *= 3
     if len(label_colours)==0: label_colours = colours
     # axes
-    if len(axes)==0: axes = setfig_3curves(figsize=figsize, stack=stack, Z_axes=Z_axes, Z_margin=Z_margin, space=space, label_colours=label_colours, xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, title=title)
+    if len(axes)==0: axes = setfig_3curves(figsize=figsize, stack=stack, Z_axes=Z_axes, Z_pad=Z_pad, Z_margin=Z_margin, space=space, label_colours=label_colours, xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, title=title)
     # plot
     x = np.linspace(0,1,n[0])
     for i in range(3):
@@ -545,7 +550,7 @@ def plot_3curves(curves, colours=[], widths=[], styles=[], markers=[], Cmax_ls='
 
 import copy
 
-def setfig_3curves(figsize=None, stack='Z', Z_axes='left', Z_margin=0, space='LCH', label_colours=[], xlim=[0,1], ylim=None, xticks=0.25, yticks=None, title=""):
+def setfig_3curves(figsize=None, stack='Z', Z_axes='left', Z_pad=0, Z_margin=0, space='LCH', label_colours=[], xlim=[0,1], ylim=None, xticks=0.25, yticks=None, title=""):
     """ Sets up the figure with three plots
         `stack` = 'V' vertical | 'H' horizontal | 'Z' depth (for the latter, axes are on the `Z_axes` side)
         `space` = 'RGB' | 'LCH'
@@ -557,7 +562,9 @@ def setfig_3curves(figsize=None, stack='Z', Z_axes='left', Z_margin=0, space='LC
     if figsize!=None and len(figsize)==1: figsize = (cols*figsize[0], rows*figsize[0])
     fig, axes = plt.subplots(rows, cols, figsize=figsize)#, constrained_layout=True)
     if stack == 'Z':
-        delta = {'left': lambda i: 0-(2-i)*0.2, 'right': lambda i: 1+i*0.2}
+        if Z_pad == 0: # auto padding
+            Z_pad = 0.2 * (4/figsize[0]) # paddings were set for size=4, they should be kept constant
+        delta = {'left': lambda i: 0-(2-i)*Z_pad, 'right': lambda i: 1+i*Z_pad}
         axes_root = axes
         axes = []
         for i in range(3):

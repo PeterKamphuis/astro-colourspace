@@ -354,6 +354,7 @@ def interpolate_Cmax_for_LH(L,H,Cmax):
     # H
     nH = Cmax.shape[1]
     j = (H-H_min)/float(H_max-H_min) * (nH-1)
+    j = np.where(np.isnan(j),0,j) # to avoid casting error
     j0 = (np.floor(j)).astype(int)
     j0 = np.maximum(np.minimum(j0,nH-1),0)
     j1 = np.where(j0 < nH-1, j0 + 1, j0)
