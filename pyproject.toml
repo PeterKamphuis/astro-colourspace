@@ -32,6 +32,7 @@ dependencies = [ 'numpy',
 Homepage = "https://github.com/gillesferrand/colourspace"
 
 [project.scripts]
+create_colourspace_tutorials = "colourspace.create_tutorials:main"
 
 [tool.hatch.version]
 path = "version.py"
